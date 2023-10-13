@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/ofertas")
 public class OfertaVehicularController {
 
-    private final double seguroVehicularAnual = 0.0472; //en porcentaje 4.72%
+    //private final double seguroVehicularAnual = 0.0472; //en porcentaje 4.72%
 
     private final double seguroDesgravamen = 0.0005; //en porcenaje 0.050%
 
-    private final double seguroVehicularMensual = 0.0039333;
+    //private final double seguroVehicularMensual = 0.0039333;
 
 
     @Autowired
@@ -48,7 +48,6 @@ public class OfertaVehicularController {
             double financiamiento = e.getPrecioVehiculo()-e.getCuotaInicial();
             //PARA EL VAN
             double tem = Math.pow(1 + (e.getTEA() / 100), 1.0 / 12) - 1;
-            //double cuotaMensual = (financiamiento * tem) / (1 - Math.pow(1 + tem, -e.getPlazo()));
             double cuotaMensual = financiamiento*(tem*(Math.pow(1+tem,e.getPlazo()))/(Math.pow(1+tem,e.getPlazo())-1));
             // +1 PARA INDICAR QUE VA DESDE EL PRIMERA MES
             double[] flujosEfectivo = new double[e.getPlazo() + 1];
@@ -96,9 +95,9 @@ public class OfertaVehicularController {
                     .interes(convertirDouble(decimalFormat,interes))
                     .deuda(convertirDouble(decimalFormat,deuda))
                     .cuota(ofertaVehicularDTO.getCuotaMensual())
-                    .seguroVeh(ofertaVehicularDTO.getPrecioVehiculo()*seguroVehicularMensual)
+                    .seguroVeh(ofertaVehicularDTO.getPrecioVehiculo()*ofertaVehicularDTO.getSeguroVehicularMensual())
                     .desgravamen(convertirDouble(decimalFormat,deuda*seguroDesgravamen))
-                    .totalPagar(convertirDouble(decimalFormat,ofertaVehicularDTO.getCuotaMensual()+ofertaVehicularDTO.getPrecioVehiculo()*seguroVehicularMensual+deuda*seguroDesgravamen))
+                    .totalPagar(convertirDouble(decimalFormat,ofertaVehicularDTO.getCuotaMensual()+ofertaVehicularDTO.getPrecioVehiculo()*ofertaVehicularDTO.getSeguroVehicularMensual()+deuda*seguroDesgravamen))
                     .saldo(convertirDouble(decimalFormat,deuda-(ofertaVehicularDTO.getCuotaMensual()-interes)))
                     .build();
             cuotas.add(cuota);
@@ -123,6 +122,8 @@ public class OfertaVehicularController {
 
     @PostMapping("/registrar")
     public ResponseEntity<?> save(@Valid @RequestBody OfertaVehicularDTO ofertaVehicularDTO) throws Exception {
+        double seguroVehicularMensual = (ofertaVehicularDTO.getSeguroVehicularAnual()*30.0)/36000.0;
+        ofertaVehicularDTO.setSeguroVehicularMensual(seguroVehicularMensual);
         OfertaVehicular oferta = ofertaVehicularService.save(mapper.map(ofertaVehicularDTO, OfertaVehicular.class));
         return new ResponseEntity<>(mapper.map(oferta, OfertaVehicularDTO.class), HttpStatus.CREATED);
     }

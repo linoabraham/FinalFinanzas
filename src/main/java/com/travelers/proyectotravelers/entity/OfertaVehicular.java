@@ -35,6 +35,12 @@ public class OfertaVehicular {
     @Column(columnDefinition = "decimal(8,2)",nullable = false)
     private double porcentajeCuotaInicial;
 
+    @Column(columnDefinition = "decimal(9,4)",nullable = false)
+    private double seguroVehicularAnual;
+
+    @Column(columnDefinition = "decimal(9,4)",nullable = false)
+    private double seguroVehicularMensual;
+
     @Column(nullable = false,length = 30)
     private int plazo;
 

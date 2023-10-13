@@ -52,6 +52,11 @@ public class OfertaVehicularDTO {
 
     private double TEA;
 
+    private double seguroVehicularAnual;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private double seguroVehicularMensual;
+
     private List<CuotaDTO> cuotas;
 
 }
