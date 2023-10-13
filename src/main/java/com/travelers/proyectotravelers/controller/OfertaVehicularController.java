@@ -91,28 +91,28 @@ public class OfertaVehicularController {
                 continue;
             }
             CuotaDTO cuota = CuotaDTO.builder()
-                    .amortización(Double.parseDouble(decimalFormat.format(ofertaVehicularDTO.getCuotaMensual()-interes)))
-                    .interes(Double.parseDouble(decimalFormat.format(interes)))
-                    .deuda(Double.parseDouble(decimalFormat.format(deuda)))
+                    .numeroCuota(i)
+                    .amortización(convertirDouble(decimalFormat,ofertaVehicularDTO.getCuotaMensual()-interes))
+                    .interes(convertirDouble(decimalFormat,interes))
+                    .deuda(convertirDouble(decimalFormat,deuda))
                     .cuota(ofertaVehicularDTO.getCuotaMensual())
                     .seguroVeh(ofertaVehicularDTO.getPrecioVehiculo()*seguroVehicularMensual)
-                    .desgravamen(Double.parseDouble(decimalFormat.format(deuda*seguroDesgravamen)))
-                    .totalPagar(Double.parseDouble(decimalFormat.format(ofertaVehicularDTO.getCuotaMensual()+ofertaVehicularDTO.getPrecioVehiculo()*seguroVehicularMensual+deuda*seguroDesgravamen)))
-                    .numeroCuota(i)
-                    .saldo(Double.parseDouble(decimalFormat.format(deuda-(ofertaVehicularDTO.getCuotaMensual()-interes))))
-                    //.saldo(Double.parseDouble(decimalFormat.format(saldo)))
+                    .desgravamen(convertirDouble(decimalFormat,deuda*seguroDesgravamen))
+                    .totalPagar(convertirDouble(decimalFormat,ofertaVehicularDTO.getCuotaMensual()+ofertaVehicularDTO.getPrecioVehiculo()*seguroVehicularMensual+deuda*seguroDesgravamen))
+                    .saldo(convertirDouble(decimalFormat,deuda-(ofertaVehicularDTO.getCuotaMensual()-interes)))
                     .build();
             cuotas.add(cuota);
-            //deuda - amortización
-
             deuda -= (ofertaVehicularDTO.getCuotaMensual()-interes);
             interes = tem*(deuda);
             if(deuda <= 0){
                 deuda=0;
             }
-
         }
         return cuotas;
+    }
+
+    private double convertirDouble(DecimalFormat decimalFormat,double numero){
+        return Double.parseDouble(decimalFormat.format(numero));
     }
 
     @GetMapping("/id")
