@@ -22,6 +22,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/ofertas")
 public class OfertaVehicularController {
 
+    private final double seguroVehicularAnual = 0.0472; //en porcentaje 4.72%
+
+    private final double seguroDesgravamen = 0.0005; //en porcenaje 0.050%
+
+    private final double seguroVehicularMensual = 0.0039333;
+
+
     @Autowired
     private IOfertaVehicularService ofertaVehicularService;
 
@@ -37,11 +44,12 @@ public class OfertaVehicularController {
                 .collect(Collectors.toList());
         lista.forEach(e -> {
             e.setCuotaInicial((e.getPorcentajeCuotaInicial() / 100) * e.getPrecioVehiculo());
-            //EL PRECIO DEL VEHICULO ES COMO EL PRESTAMO
-            double prestamo = e.getPrecioVehiculo()-e.getCuotaInicial();
+            //EL PRECIO DEL VEHICULO ES COMO EL PRESTAMO (financiamiento)
+            double financiamiento = e.getPrecioVehiculo()-e.getCuotaInicial();
             //PARA EL VAN
             double tem = Math.pow(1 + (e.getTEA() / 100), 1.0 / 12) - 1;
-            double cuotaMensual = (prestamo * tem) / (1 - Math.pow(1 + tem, -e.getPlazo()));
+            //double cuotaMensual = (financiamiento * tem) / (1 - Math.pow(1 + tem, -e.getPlazo()));
+            double cuotaMensual = financiamiento*(tem*(Math.pow(1+tem,e.getPlazo()))/(Math.pow(1+tem,e.getPlazo())-1));
             // +1 PARA INDICAR QUE VA DESDE EL PRIMERA MES
             double[] flujosEfectivo = new double[e.getPlazo() + 1];
             for (int i = 0; i < e.getPlazo(); i++) {
@@ -55,31 +63,54 @@ public class OfertaVehicularController {
             // Calcular el VAN
             double van = -e.getPrecioVehiculo();
             for (int i = 1; i <= e.getPlazo(); i++) {
-                double valorPresente = flujosEfectivo[i] / Math.pow(1 + tem, i);
-                van += valorPresente;
+                van += flujosEfectivo[i] / Math.pow(1 + tem, i);
             }
             DecimalFormat decimalFormat = new DecimalFormat("#.###");
+            e.setTir(Double.parseDouble(decimalFormat.format(tem)));
             e.setCuotaMensual(Double.parseDouble(decimalFormat.format(cuotaMensual)));
             e.setVan(Double.parseDouble(decimalFormat.format(van)));
 
-            e.setCuotas(calcularCuotas(e,prestamo));
+            e.setCuotas(calcularCuotas(e,financiamiento,tem));
         });
 
         return new ResponseEntity<>(lista, HttpStatus.OK);
     }
 
-    private List<CuotaDTO> calcularCuotas(OfertaVehicularDTO ofertaVehicularDTO,double prestamo) {
+    private List<CuotaDTO> calcularCuotas(OfertaVehicularDTO ofertaVehicularDTO,double financiamiento,double tem) {
         List<CuotaDTO> cuotas = new ArrayList<>();
-        double saldo = prestamo;
         DecimalFormat decimalFormat = new DecimalFormat("#.###");
-        for (int i = 1; i <= ofertaVehicularDTO.getPlazo(); i++) {
+        double interes = tem*(financiamiento);
+        double deuda = financiamiento;
+        for (int i = 0; i <= ofertaVehicularDTO.getPlazo(); i++) {
+            if(i==0){
+                cuotas.add(new CuotaDTO().builder()
+                        .numeroCuota(0)
+                        .deuda(financiamiento)
+                        .saldo(financiamiento)
+                        .build());
+                continue;
+            }
             CuotaDTO cuota = CuotaDTO.builder()
+                    .amortización(Double.parseDouble(decimalFormat.format(ofertaVehicularDTO.getCuotaMensual()-interes)))
+                    .interes(Double.parseDouble(decimalFormat.format(interes)))
+                    .deuda(Double.parseDouble(decimalFormat.format(deuda)))
                     .cuota(ofertaVehicularDTO.getCuotaMensual())
+                    .seguroVeh(ofertaVehicularDTO.getPrecioVehiculo()*seguroVehicularMensual)
+                    .desgravamen(Double.parseDouble(decimalFormat.format(deuda*seguroDesgravamen)))
+                    .totalPagar(Double.parseDouble(decimalFormat.format(ofertaVehicularDTO.getCuotaMensual()+ofertaVehicularDTO.getPrecioVehiculo()*seguroVehicularMensual+deuda*seguroDesgravamen)))
                     .numeroCuota(i)
-                    .saldo(Double.parseDouble(decimalFormat.format(saldo)))
+                    .saldo(Double.parseDouble(decimalFormat.format(deuda-(ofertaVehicularDTO.getCuotaMensual()-interes))))
+                    //.saldo(Double.parseDouble(decimalFormat.format(saldo)))
                     .build();
             cuotas.add(cuota);
-            saldo -= ofertaVehicularDTO.getCuotaMensual();
+            //deuda - amortización
+
+            deuda -= (ofertaVehicularDTO.getCuotaMensual()-interes);
+            interes = tem*(deuda);
+            if(deuda <= 0){
+                deuda=0;
+            }
+
         }
         return cuotas;
     }

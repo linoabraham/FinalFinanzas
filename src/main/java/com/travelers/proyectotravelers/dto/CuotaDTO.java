@@ -13,11 +13,20 @@ public class CuotaDTO {
 
     private int numeroCuota;
 
-    private double saldo;
+    private double deuda;
+
+    private double amortización;
+
+    private double interes;
 
     private double cuota;
 
-    //private LocalDateTime fecha;
+    private double seguroVeh;
 
+    private double desgravamen;
+
+    private double totalPagar;
+
+    private double saldo;
 
 }

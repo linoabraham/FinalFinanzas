@@ -32,13 +32,6 @@ public class OfertaVehicularDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double cuotaMensual;
 
-    /*
-    @NotEmpty
-    @Size(max = 50,min = 3)
-    private String tipoAuto;
-
-     */
-
     @NotEmpty
     @Size(max = 20,min = 3)
     private String moneda;
