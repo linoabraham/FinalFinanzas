@@ -3,7 +3,6 @@ package com.travelers.proyectotravelers.controller;
 import com.travelers.proyectotravelers.dto.ConfiguracionUsuarioDTO;
 import com.travelers.proyectotravelers.entity.Cliente;
 import com.travelers.proyectotravelers.entity.ConfiguracionUsuario;
-import com.travelers.proyectotravelers.security.JwtTokenUtil;
 import com.travelers.proyectotravelers.service.IClienteService;
 import com.travelers.proyectotravelers.service.IConfiguracionUsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,13 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/configuraciones")
+@CrossOrigin("*")
 public class ConfiguracionUsuarioController {
 
     @Autowired
@@ -31,9 +28,8 @@ public class ConfiguracionUsuarioController {
     @Qualifier("configuracionMapper")
     private ModelMapper mapper;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
 
+    /*
     @PostMapping("/consultas")
     public ResponseEntity<?> save(@RequestBody ConfiguracionUsuarioDTO configuracionUsuarioDTO, HttpServletRequest req) throws Exception{
         configuracionUsuarioDTO.setCliente(obtenerCliente(req));
@@ -46,7 +42,7 @@ public class ConfiguracionUsuarioController {
         String token = jwtTokenUtil.getToken(req);
         String clienteNombre = jwtTokenUtil.getUsernameFromToken(token);
         return clienteService.findOneByNombre(clienteNombre);
-    }
+    }*/
 
 
 }

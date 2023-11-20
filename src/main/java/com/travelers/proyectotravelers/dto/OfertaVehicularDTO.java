@@ -1,10 +1,6 @@
 package com.travelers.proyectotravelers.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -48,7 +44,9 @@ public class OfertaVehicularDTO {
 
     private int plazo; //24 o 36 meses
 
-    private int plazosGracia;
+    private int plazosGraciaTotal;
+
+    private int plazoGraciaParcial;
 
     private double TEA;
 
@@ -57,6 +55,15 @@ public class OfertaVehicularDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private double seguroVehicularMensual;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private double desgravamen;
+
+    private double COK;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<CuotaDTO> cuotas;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<Double> flujos;
 
 }

@@ -40,4 +40,14 @@ public class UsuarioServiceImpl implements IUsuarioService {
     public void deleteById(Integer id) throws Exception {
         repo.deleteById(id);
     }
+
+    @Override
+    public Usuario findOneByUsername(String username) {
+        return repo.findOneByUsername(username);
+    }
+
+    @Override
+    public Usuario findOneByUsernameAndPassword(String username, String password) {
+        return repo.findOneByUsernameAndPassword(username,password);
+    }
 }

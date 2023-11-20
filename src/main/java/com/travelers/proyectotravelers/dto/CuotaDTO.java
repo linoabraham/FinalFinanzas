@@ -23,10 +23,10 @@ public class CuotaDTO {
 
     private double seguroVeh;
 
-    private double desgravamen;
-
     private double totalPagar;
 
     private double saldo;
+
+    private double flujo;
 
 }

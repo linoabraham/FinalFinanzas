@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clientes")
+@CrossOrigin("*")
 public class ClienteController {
 
     @Autowired
@@ -29,11 +29,6 @@ public class ClienteController {
     @Qualifier("clienteMapper")
     private ModelMapper mapper;
 
-    private final PasswordEncoder passwordEncoder;
-
-    public ClienteController(PasswordEncoder passwordEncoder){
-        this.passwordEncoder = new BCryptPasswordEncoder();
-    }
 
     @GetMapping
     public ResponseEntity<?> findAll() throws Exception{
@@ -57,7 +52,6 @@ public class ClienteController {
 
     @PostMapping("/registrar")
     public ResponseEntity<?> save(@Valid @RequestBody ClienteDTO clienteDTO) throws Exception{
-        clienteDTO.getUsuario().setPassword(passwordEncoder.encode(clienteDTO.getUsuario().getPassword()));
         Cliente cliente = clienteService.save(mapper.map(clienteDTO,Cliente.class));
         return new ResponseEntity<>(mapper.map(cliente,ClienteDTO.class),HttpStatus.CREATED);
     }

@@ -38,17 +38,23 @@ public class OfertaVehicular {
     @Column(columnDefinition = "decimal(9,4)",nullable = false)
     private double seguroVehicularAnual;
 
-    @Column(columnDefinition = "decimal(9,4)",nullable = false)
+    @Column(columnDefinition = "decimal(11,8)",nullable = false)
     private double seguroVehicularMensual;
 
     @Column(nullable = false,length = 30)
     private int plazo;
 
-    @Column(nullable = false,length = 30)
-    private int plazosGracia;
+    private int plazosGraciaTotal;
+
+    private int plazoGraciaParcial;
 
     @Column(columnDefinition = "decimal(6,2)",nullable = false)
     private double TEA;
+
+    @Column(columnDefinition = "decimal(6,2)",nullable = false)
+    private double desgravamen;
+
+    private double COK;
 
 }
 

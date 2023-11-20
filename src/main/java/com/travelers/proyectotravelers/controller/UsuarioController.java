@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")
+@CrossOrigin("*")
 public class UsuarioController {
 
     @Autowired
@@ -25,6 +26,7 @@ public class UsuarioController {
     @Autowired
     @Qualifier("usuarioMapper")
     private ModelMapper mapper;
+
 
     @GetMapping
     public ResponseEntity<?> findAll() throws Exception{
@@ -51,6 +53,16 @@ public class UsuarioController {
     public ResponseEntity<?> update(@Valid @RequestBody UsuarioDTO usuarioDTO) throws Exception{
         Usuario usuario = service.update(mapper.map(usuarioDTO,Usuario.class));
         return new ResponseEntity<>(mapper.map(usuario,UsuarioDTO.class),HttpStatus.CREATED);
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<?> findUserByUsernameAndPassword(@RequestParam("username") String username,@RequestParam("password") String password) throws Exception{
+        Usuario usuario = service.findOneByUsernameAndPassword(username,password);
+        if(usuario!=null){
+            return new ResponseEntity<>(Map.of("estado",true),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(Map.of("estado",false),HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/delete")
